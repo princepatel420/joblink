@@ -1,136 +1,370 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Worker-Employer Connect</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: #f4f4f4;
-    }
-    header {
-      background: #007bff;
-      color: white;
-      padding: 1rem;
-      text-align: center;
-    }
-    main {
-      display: flex;
-      justify-content: space-around;
-      padding: 2rem;
-      gap: 2rem;
-      flex-wrap: wrap;
-    }
-    section {
-      background: white;
-      padding: 1rem;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      flex: 1 1 300px;
-      max-width: 500px;
-    }
-    h2 {
-      margin-top: 0;
-    }
-    label {
-      display: block;
-      margin: 0.5rem 0 0.2rem;
-    }
-    input, textarea, select, button {
-      width: 100%;
-      padding: 0.5rem;
-      margin-bottom: 1rem;
-      border-radius: 4px;
-      border: 1px solid #ccc;
-      box-sizing: border-box;
-    }
-    button {
-      background: #007bff;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #0056b3;
-    }
-    .job-listing {
-      border-bottom: 1px solid #ddd;
-      padding: 0.5rem 0;
-    }
-    .job-listing:last-child {
-      border-bottom: none;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Worker-Employer Connect</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0; padding: 0;
+    background: #f4f4f4;
+  }
+  header {
+    background: #007bff;
+    color: white;
+    padding: 1rem;
+    text-align: center;
+  }
+  main {
+    max-width: 900px;
+    margin: 2rem auto;
+    background: white;
+    padding: 1rem 2rem 2rem 2rem;
+    border-radius: 8px;
+    box-shadow: 0 0 10px #ccc;
+  }
+  h2 {
+    margin-top: 0;
+  }
+  .hidden {
+    display: none;
+  }
+  form > div {
+    margin-bottom: 1rem;
+  }
+  label {
+    display: block;
+    margin-bottom: 0.3rem;
+  }
+  input, select, textarea {
+    width: 100%;
+    padding: 0.5rem;
+    box-sizing: border-box;
+  }
+  button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 0.7rem 1.2rem;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+  button:hover {
+    background: #0056b3;
+  }
+  nav {
+    margin-bottom: 1rem;
+  }
+  nav button {
+    margin-right: 1rem;
+  }
+  .job {
+    border: 1px solid #ddd;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    border-radius: 6px;
+  }
+  .job h3 {
+    margin: 0 0 0.5rem 0;
+  }
+  .apply-btn {
+    background: #28a745;
+  }
+  .apply-btn:hover {
+    background: #1e7e34;
+  }
+  .message {
+    margin: 1rem 0;
+    padding: 0.7rem;
+    border-radius: 4px;
+  }
+  .message.success {
+    background: #d4edda;
+    color: #155724;
+  }
+  .message.error {
+    background: #f8d7da;
+    color: #721c24;
+  }
+</style>
 </head>
 <body>
-  <header>
-    <h1>Worker-Employer Connect</h1>
-  </header>
-  <main>
-    <section id="post-job">
-      <h2>Post a Job (Employer)</h2>
-      <form id="jobForm">
-        <label for="jobTitle">Job Title</label>
-        <input type="text" id="jobTitle" required />
-        
-        <label for="jobDescription">Job Description</label>
-        <textarea id="jobDescription" rows="4" required></textarea>
-        
-        <label for="jobType">Job Type</label>
-        <select id="jobType" required>
-          <option value="">Select type</option>
-          <option value="Full-time">Full-time</option>
-          <option value="Part-time">Part-time</option>
-          <option value="Contract">Contract</option>
-          <option value="Internship">Internship</option>
-        </select>
-        
-        <button type="submit">Post Job</button>
-      </form>
-    </section>
-    <section id="job-listings">
-      <h2>Available Jobs (Worker)</h2>
-      <div id="jobsContainer">
-        <p>No jobs posted yet.</p>
+
+<header>
+  <h1>Worker-Employer Connect</h1>
+</header>
+
+<main>
+  <nav id="nav-auth">
+    <button id="btn-show-register">Register</button>
+    <button id="btn-show-login">Login</button>
+  </nav>
+
+  <section id="register-section" class="hidden">
+    <h2>Register</h2>
+    <form id="register-form">
+      <div>
+        <label for="reg-username">Username</label>
+        <input type="text" id="reg-username" required />
       </div>
-    </section>
-  </main>
+      <div>
+        <label for="reg-password">Password</label>
+        <input type="password" id="reg-password" required />
+      </div>
+      <div>
+        <label for="reg-role">I am a</label>
+        <select id="reg-role" required>
+          <option value="">Select role</option>
+          <option value="worker">Worker</option>
+          <option value="employer">Employer</option>
+        </select>
+      </div>
+      <button type="submit">Register</button>
+    </form>
+    <div id="register-message"></div>
+  </section>
 
-  <script>
-    const jobForm = document.getElementById('jobForm');
-    const jobsContainer = document.getElementById('jobsContainer');
+  <section id="login-section" class="hidden">
+    <h2>Login</h2>
+    <form id="login-form">
+      <div>
+        <label for="login-username">Username</label>
+        <input type="text" id="login-username" required />
+      </div>
+      <div>
+        <label for="login-password">Password</label>
+        <input type="password" id="login-password" required />
+      </div>
+      <button type="submit">Login</button>
+    </form>
+    <div id="login-message"></div>
+  </section>
 
-    jobForm.addEventListener('submit', function(event) {
-      event.preventDefault();
+  <section id="employer-dashboard" class="hidden">
+    <h2>Employer Dashboard</h2>
+    <button id="btn-logout-employer">Logout</button>
+    <h3>Post a Job</h3>
+    <form id="job-post-form">
+      <div>
+        <label for="job-title">Job Title</label>
+        <input type="text" id="job-title" required />
+      </div>
+      <div>
+        <label for="job-description">Job Description</label>
+        <textarea id="job-description" rows="4" required></textarea>
+      </div>
+      <button type="submit">Post Job</button>
+    </form>
+    <h3>Your Posted Jobs</h3>
+    <div id="employer-jobs-list"></div>
+  </section>
 
-      const title = document.getElementById('jobTitle').value.trim();
-      const description = document.getElementById('jobDescription').value.trim();
-      const type = document.getElementById('jobType').value;
+  <section id="worker-dashboard" class="hidden">
+    <h2>Worker Dashboard</h2>
+    <button id="btn-logout-worker">Logout</button>
+    <h3>Available Jobs</h3>
+    <div id="jobs-list"></div>
+    <h3>Jobs You Applied To</h3>
+    <div id="applied-jobs-list"></div>
+  </section>
+</main>
 
-      if (!title || !description || !type) {
-        alert('Please fill in all fields.');
-        return;
-      }
+<script>
+  // Data storage in memory
+  const users = [];
+  const jobs = [];
+  const applications = [];
 
-      const jobDiv = document.createElement('div');
-      jobDiv.classList.add('job-listing');
-      jobDiv.innerHTML = `
-        <h3>${title}</h3>
-        <p><strong>Type:</strong> ${type}</p>
-        <p>${description}</p>
-      `;
+  // Current logged in user
+  let currentUser = null;
 
-      if (jobsContainer.querySelector('p') && jobsContainer.querySelector('p').textContent === 'No jobs posted yet.') {
-        jobsContainer.innerHTML = '';
-      }
+  // Elements
+  const navAuth = document.getElementById('nav-auth');
+  const registerSection = document.getElementById('register-section');
+  const loginSection = document.getElementById('login-section');
+  const employerDashboard = document.getElementById('employer-dashboard');
+  const workerDashboard = document.getElementById('worker-dashboard');
 
-      jobsContainer.appendChild(jobDiv);
+  const registerForm = document.getElementById('register-form');
+  const registerMessage = document.getElementById('register-message');
 
-      jobForm.reset();
+  const loginForm = document.getElementById('login-form');
+  const loginMessage = document.getElementById('login-message');
+
+  const jobPostForm = document.getElementById('job-post-form');
+  const employerJobsList = document.getElementById('employer-jobs-list');
+
+  const jobsList = document.getElementById('jobs-list');
+  const appliedJobsList = document.getElementById('applied-jobs-list');
+
+  // Show/hide sections
+  function showSection(section) {
+    [registerSection, loginSection, employerDashboard, workerDashboard].forEach(s => s.classList.add('hidden'));
+    section.classList.remove('hidden');
+  }
+
+  // Show register form
+  document.getElementById('btn-show-register').addEventListener('click', () => {
+    showSection(registerSection);
+    registerMessage.textContent = '';
+  });
+
+  // Show login form
+  document.getElementById('btn-show-login').addEventListener('click', () => {
+    showSection(loginSection);
+    loginMessage.textContent = '';
+  });
+
+  // Register user
+  registerForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const username = document.getElementById('reg-username').value.trim();
+    const password = document.getElementById('reg-password').value;
+    const role = document.getElementById('reg-role').value;
+
+    if (users.find(u => u.username === username)) {
+      registerMessage.textContent = 'Username already exists.';
+      registerMessage.className = 'message error';
+      return;
+    }
+    if (!role) {
+      registerMessage.textContent = 'Please select a role.';
+      registerMessage.className = 'message error';
+      return;
+    }
+
+    users.push({ username, password, role });
+    registerMessage.textContent = 'Registration successful! You can now log in.';
+    registerMessage.className = 'message success';
+    registerForm.reset();
+  });
+
+  // Login user
+  loginForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const username = document.getElementById('login-username').value.trim();
+    const password = document.getElementById('login-password').value;
+
+    const user = users.find(u => u.username === username && u.password === password);
+    if (!user) {
+      loginMessage.textContent = 'Invalid username or password.';
+      loginMessage.className = 'message error';
+      return;
+    }
+
+    currentUser = user;
+    loginMessage.textContent = '';
+    loginForm.reset();
+    navAuth.classList.add('hidden');
+
+    if (user.role === 'employer') {
+      showSection(employerDashboard);
+      renderEmployerJobs();
+    } else {
+      showSection(workerDashboard);
+      renderJobs();
+      renderAppliedJobs();
+    }
+  });
+
+  // Logout buttons
+  document.getElementById('btn-logout-employer').addEventListener('click', () => {
+    currentUser = null;
+    navAuth.classList.remove('hidden');
+    showSection(loginSection);
+  });
+  document.getElementById('btn-logout-worker').addEventListener('click', () => {
+    currentUser = null;
+    navAuth.classList.remove('hidden');
+    showSection(loginSection);
+  });
+
+  // Employer posts a job
+  jobPostForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const title = document.getElementById('job-title').value.trim();
+    const description = document.getElementById('job-description').value.trim();
+
+    if (!title || !description) return;
+
+    jobs.push({
+      id: jobs.length + 1,
+      title,
+      description,
+      employer: currentUser.username
     });
-  </script>
+
+    jobPostForm.reset();
+    renderEmployerJobs();
+  });
+
+  // Render employer's posted jobs
+  function renderEmployerJobs() {
+    employerJobsList.innerHTML = '';
+    const employerJobs = jobs.filter(job => job.employer === currentUser.username);
+    if (employerJobs.length === 0) {
+      employerJobsList.textContent = 'No jobs posted yet.';
+      return;
+    }
+    employerJobs.forEach(job => {
+      const div = document.createElement('div');
+      div.className = 'job';
+      div.innerHTML = `<h3>${job.title}</h3><p>${job.description}</p>`;
+      employerJobsList.appendChild(div);
+    });
+  }
+
+  // Render available jobs for workers
+  function renderJobs() {
+    jobsList.innerHTML = '';
+    if (jobs.length === 0) {
+      jobsList.textContent = 'No jobs available at the moment.';
+      return;
+    }
+    jobs.forEach(job => {
+      const div = document.createElement('div');
+      div.className = 'job';
+      div.innerHTML = `<h3>${job.title}</h3><p>${job.description}</p>`;
+      const applied = applications.find(app => app.jobId === job.id && app.worker === currentUser.username);
+      const btn = document.createElement('button');
+      btn.textContent = applied ? 'Applied' : 'Apply';
+      btn.disabled = applied ? true : false;
+      btn.className = 'apply-btn';
+      btn.addEventListener('click', () => {
+        applications.push({ jobId: job.id, worker: currentUser.username });
+        btn.textContent = 'Applied';
+        btn.disabled = true;
+        renderAppliedJobs();
+      });
+      div.appendChild(btn);
+      jobsList.appendChild(div);
+    });
+  }
+
+  // Render jobs the worker applied to
+  function renderAppliedJobs() {
+    appliedJobsList.innerHTML = '';
+    const appliedJobs = applications
+      .filter(app => app.worker === currentUser.username)
+      .map(app => jobs.find(job => job.id === app.jobId))
+      .filter(job => job !== undefined);
+
+    if (appliedJobs.length === 0) {
+      appliedJobsList.textContent = 'You have not applied to any jobs yet.';
+      return;
+    }
+    appliedJobs.forEach(job => {
+      const div = document.createElement('div');
+      div.className = 'job';
+      div.innerHTML = `<h3>${job.title}</h3><p>${job.description}</p>`;
+      appliedJobsList.appendChild(div);
+    });
+  }
+
+  // Initial view
+  showSection(loginSection);
+</script>
+
 </body>
 </html>
