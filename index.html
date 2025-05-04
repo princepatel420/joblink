@@ -171,15 +171,12 @@
 </main>
 
 <script>
-  // Data storage in memory
-  const users = [];
-  const jobs = [];
-  const applications = [];
+  const API_URL = 'http://localhost:3000/api';
 
-  // Current logged in user
   let currentUser = null;
+  let jobs = [];
+  let applications = [];
 
-  // Elements
   const navAuth = document.getElementById('nav-auth');
   const registerSection = document.getElementById('register-section');
   const loginSection = document.getElementById('login-section');
@@ -198,111 +195,143 @@
   const jobsList = document.getElementById('jobs-list');
   const appliedJobsList = document.getElementById('applied-jobs-list');
 
-  // Show/hide sections
   function showSection(section) {
     [registerSection, loginSection, employerDashboard, workerDashboard].forEach(s => s.classList.add('hidden'));
     section.classList.remove('hidden');
   }
 
-  // Show register form
   document.getElementById('btn-show-register').addEventListener('click', () => {
     showSection(registerSection);
     registerMessage.textContent = '';
   });
 
-  // Show login form
   document.getElementById('btn-show-login').addEventListener('click', () => {
     showSection(loginSection);
     loginMessage.textContent = '';
   });
 
-  // Register user
-  registerForm.addEventListener('submit', e => {
+  registerForm.addEventListener('submit', async e => {
     e.preventDefault();
     const username = document.getElementById('reg-username').value.trim();
     const password = document.getElementById('reg-password').value;
     const role = document.getElementById('reg-role').value;
 
-    if (users.find(u => u.username === username)) {
-      registerMessage.textContent = 'Username already exists.';
+    try {
+      const res = await fetch(`${API_URL}/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password, role })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Registration failed');
+      registerMessage.textContent = data.message;
+      registerMessage.className = 'message success';
+      registerForm.reset();
+    } catch (err) {
+      registerMessage.textContent = err.message;
       registerMessage.className = 'message error';
-      return;
     }
-    if (!role) {
-      registerMessage.textContent = 'Please select a role.';
-      registerMessage.className = 'message error';
-      return;
-    }
-
-    users.push({ username, password, role });
-    registerMessage.textContent = 'Registration successful! You can now log in.';
-    registerMessage.className = 'message success';
-    registerForm.reset();
   });
 
-  // Login user
-  loginForm.addEventListener('submit', e => {
+  loginForm.addEventListener('submit', async e => {
     e.preventDefault();
     const username = document.getElementById('login-username').value.trim();
     const password = document.getElementById('login-password').value;
 
-    const user = users.find(u => u.username === username && u.password === password);
-    if (!user) {
-      loginMessage.textContent = 'Invalid username or password.';
+    try {
+      const res = await fetch(`${API_URL}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Login failed');
+      currentUser = data;
+      loginMessage.textContent = '';
+      loginForm.reset();
+      navAuth.classList.add('hidden');
+      if (currentUser.role === 'employer') {
+        showSection(employerDashboard);
+        fetchEmployerJobs();
+      } else {
+        showSection(workerDashboard);
+        fetchJobs();
+        fetchApplications();
+      }
+    } catch (err) {
+      loginMessage.textContent = err.message;
       loginMessage.className = 'message error';
-      return;
-    }
-
-    currentUser = user;
-    loginMessage.textContent = '';
-    loginForm.reset();
-    navAuth.classList.add('hidden');
-
-    if (user.role === 'employer') {
-      showSection(employerDashboard);
-      renderEmployerJobs();
-    } else {
-      showSection(workerDashboard);
-      renderJobs();
-      renderAppliedJobs();
     }
   });
 
-  // Logout buttons
   document.getElementById('btn-logout-employer').addEventListener('click', () => {
     currentUser = null;
     navAuth.classList.remove('hidden');
     showSection(loginSection);
   });
+
   document.getElementById('btn-logout-worker').addEventListener('click', () => {
     currentUser = null;
     navAuth.classList.remove('hidden');
     showSection(loginSection);
   });
 
-  // Employer posts a job
-  jobPostForm.addEventListener('submit', e => {
+  jobPostForm.addEventListener('submit', async e => {
     e.preventDefault();
     const title = document.getElementById('job-title').value.trim();
     const description = document.getElementById('job-description').value.trim();
 
     if (!title || !description) return;
 
-    jobs.push({
-      id: jobs.length + 1,
-      title,
-      description,
-      employer: currentUser.username
-    });
-
-    jobPostForm.reset();
-    renderEmployerJobs();
+    try {
+      const res = await fetch(`${API_URL}/jobs`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title, description, employer: currentUser.username })
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || 'Failed to post job');
+      jobPostForm.reset();
+      fetchEmployerJobs();
+    } catch (err) {
+      alert(err.message);
+    }
   });
 
-  // Render employer's posted jobs
-  function renderEmployerJobs() {
+  async function fetchEmployerJobs() {
+    try {
+      const res = await fetch(`${API_URL}/jobs`);
+      const allJobs = await res.json();
+      const employerJobs = allJobs.filter(job => job.employer === currentUser.username);
+      renderEmployerJobs(employerJobs);
+    } catch (err) {
+      employerJobsList.textContent = 'Failed to load jobs.';
+    }
+  }
+
+  async function fetchJobs() {
+    try {
+      const res = await fetch(`${API_URL}/jobs`);
+      jobs = await res.json();
+      renderJobs();
+    } catch (err) {
+      jobsList.textContent = 'Failed to load jobs.';
+    }
+  }
+
+  // For demo, applications are stored in localStorage per user
+  function fetchApplications() {
+    const saved = localStorage.getItem(`applications_${currentUser.username}`);
+    applications = saved ? JSON.parse(saved) : [];
+    renderAppliedJobs();
+  }
+
+  function saveApplications() {
+    localStorage.setItem(`applications_${currentUser.username}`, JSON.stringify(applications));
+  }
+
+  function renderEmployerJobs(employerJobs) {
     employerJobsList.innerHTML = '';
-    const employerJobs = jobs.filter(job => job.employer === currentUser.username);
     if (employerJobs.length === 0) {
       employerJobsList.textContent = 'No jobs posted yet.';
       return;
@@ -315,7 +344,6 @@
     });
   }
 
-  // Render available jobs for workers
   function renderJobs() {
     jobsList.innerHTML = '';
     if (jobs.length === 0) {
@@ -326,13 +354,14 @@
       const div = document.createElement('div');
       div.className = 'job';
       div.innerHTML = `<h3>${job.title}</h3><p>${job.description}</p>`;
-      const applied = applications.find(app => app.jobId === job.id && app.worker === currentUser.username);
+      const applied = applications.find(app => app.jobId === job.id);
       const btn = document.createElement('button');
       btn.textContent = applied ? 'Applied' : 'Apply';
       btn.disabled = applied ? true : false;
       btn.className = 'apply-btn';
       btn.addEventListener('click', () => {
-        applications.push({ jobId: job.id, worker: currentUser.username });
+        applications.push({ jobId: job.id });
+        saveApplications();
         btn.textContent = 'Applied';
         btn.disabled = true;
         renderAppliedJobs();
@@ -342,11 +371,9 @@
     });
   }
 
-  // Render jobs the worker applied to
   function renderAppliedJobs() {
     appliedJobsList.innerHTML = '';
     const appliedJobs = applications
-      .filter(app => app.worker === currentUser.username)
       .map(app => jobs.find(job => job.id === app.jobId))
       .filter(job => job !== undefined);
 
