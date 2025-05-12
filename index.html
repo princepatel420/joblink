@@ -1,397 +1,75 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Worker-Employer Connect</title>
-<style>
-  body {
-    font-family: Arial, sans-serif;
-    margin: 0; padding: 0;
-    background: #f4f4f4;
-  }
-  header {
-    background: #007bff;
-    color: white;
-    padding: 1rem;
-    text-align: center;
-  }
-  main {
-    max-width: 900px;
-    margin: 2rem auto;
-    background: white;
-    padding: 1rem 2rem 2rem 2rem;
-    border-radius: 8px;
-    box-shadow: 0 0 10px #ccc;
-  }
-  h2 {
-    margin-top: 0;
-  }
-  .hidden {
-    display: none;
-  }
-  form > div {
-    margin-bottom: 1rem;
-  }
-  label {
-    display: block;
-    margin-bottom: 0.3rem;
-  }
-  input, select, textarea {
-    width: 100%;
-    padding: 0.5rem;
-    box-sizing: border-box;
-  }
-  button {
-    background: #007bff;
-    color: white;
-    border: none;
-    padding: 0.7rem 1.2rem;
-    cursor: pointer;
-    border-radius: 4px;
-  }
-  button:hover {
-    background: #0056b3;
-  }
-  nav {
-    margin-bottom: 1rem;
-  }
-  nav button {
-    margin-right: 1rem;
-  }
-  .job {
-    border: 1px solid #ddd;
-    padding: 1rem;
-    margin-bottom: 1rem;
-    border-radius: 6px;
-  }
-  .job h3 {
-    margin: 0 0 0.5rem 0;
-  }
-  .apply-btn {
-    background: #28a745;
-  }
-  .apply-btn:hover {
-    background: #1e7e34;
-  }
-  .message {
-    margin: 1rem 0;
-    padding: 0.7rem;
-    border-radius: 4px;
-  }
-  .message.success {
-    background: #d4edda;
-    color: #155724;
-  }
-  .message.error {
-    background: #f8d7da;
-    color: #721c24;
-  }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Playmate-Connect</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
 
-<header>
-  <h1>Worker-Employer Connect</h1>
-</header>
+  <!-- Home Page -->
+  <div id="homePage" class="text-center">
+    <h1 class="text-4xl font-bold text-blue-600 mb-4">Welcome to Playmate-Connect</h1>
+    <p class="text-gray-700 mb-6">Find your ideal gaming partners. Anytime. Anywhere.</p>
+    <div class="space-x-4">
+      <button onclick="showPage('signupPage')" class="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">Sign Up</button>
+      <button onclick="showPage('loginPage')" class="px-6 py-2 border border-blue-600 text-blue-600 rounded hover:bg-blue-50">Login</button>
+    </div>
+  </div>
 
-<main>
-  <nav id="nav-auth">
-    <button id="btn-show-register">Register</button>
-    <button id="btn-show-login">Login</button>
-  </nav>
-
-  <section id="register-section" class="hidden">
-    <h2>Register</h2>
-    <form id="register-form">
-      <div>
-        <label for="reg-username">Username</label>
-        <input type="text" id="reg-username" required />
+  <!-- Login Page -->
+  <div id="loginPage" class="hidden bg-white p-8 rounded shadow-md w-96">
+    <h2 class="text-2xl font-bold text-center text-blue-600 mb-6">Login to Playmate-Connect</h2>
+    <form>
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-1">Email</label>
+        <input type="email" class="w-full px-4 py-2 border rounded" required />
       </div>
-      <div>
-        <label for="reg-password">Password</label>
-        <input type="password" id="reg-password" required />
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-1">Password</label>
+        <input type="password" class="w-full px-4 py-2 border rounded" required />
       </div>
-      <div>
-        <label for="reg-role">I am a</label>
-        <select id="reg-role" required>
-          <option value="">Select role</option>
-          <option value="worker">Worker</option>
-          <option value="employer">Employer</option>
-        </select>
-      </div>
-      <button type="submit">Register</button>
+      <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Login</button>
+      <p class="text-sm text-center mt-4 text-gray-600">Don't have an account?
+        <a href="#" onclick="showPage('signupPage')" class="text-blue-600 hover:underline">Sign up</a> | 
+        <a href="#" onclick="showPage('homePage')" class="text-gray-500 hover:underline">Home</a>
+      </p>
     </form>
-    <div id="register-message"></div>
-  </section>
+  </div>
 
-  <section id="login-section" class="hidden">
-    <h2>Login</h2>
-    <form id="login-form">
-      <div>
-        <label for="login-username">Username</label>
-        <input type="text" id="login-username" required />
+  <!-- Signup Page -->
+  <div id="signupPage" class="hidden bg-white p-8 rounded shadow-md w-96">
+    <h2 class="text-2xl font-bold text-center text-blue-600 mb-6">Create your account</h2>
+    <form>
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-1">Username</label>
+        <input type="text" class="w-full px-4 py-2 border rounded" required />
       </div>
-      <div>
-        <label for="login-password">Password</label>
-        <input type="password" id="login-password" required />
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-1">Email</label>
+        <input type="email" class="w-full px-4 py-2 border rounded" required />
       </div>
-      <button type="submit">Login</button>
+      <div class="mb-4">
+        <label class="block text-gray-700 mb-1">Password</label>
+        <input type="password" class="w-full px-4 py-2 border rounded" required />
+      </div>
+      <button type="submit" class="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">Sign Up</button>
+      <p class="text-sm text-center mt-4 text-gray-600">Already have an account?
+        <a href="#" onclick="showPage('loginPage')" class="text-blue-600 hover:underline">Login</a> | 
+        <a href="#" onclick="showPage('homePage')" class="text-gray-500 hover:underline">Home</a>
+      </p>
     </form>
-    <div id="login-message"></div>
-  </section>
+  </div>
 
-  <section id="employer-dashboard" class="hidden">
-    <h2>Employer Dashboard</h2>
-    <button id="btn-logout-employer">Logout</button>
-    <h3>Post a Job</h3>
-    <form id="job-post-form">
-      <div>
-        <label for="job-title">Job Title</label>
-        <input type="text" id="job-title" required />
-      </div>
-      <div>
-        <label for="job-description">Job Description</label>
-        <textarea id="job-description" rows="4" required></textarea>
-      </div>
-      <button type="submit">Post Job</button>
-    </form>
-    <h3>Your Posted Jobs</h3>
-    <div id="employer-jobs-list"></div>
-  </section>
-
-  <section id="worker-dashboard" class="hidden">
-    <h2>Worker Dashboard</h2>
-    <button id="btn-logout-worker">Logout</button>
-    <h3>Available Jobs</h3>
-    <div id="jobs-list"></div>
-    <h3>Jobs You Applied To</h3>
-    <div id="applied-jobs-list"></div>
-  </section>
-</main>
-
-<script>
-  const API_URL = 'http://localhost:3000/api';
-
-  let currentUser = null;
-  let jobs = [];
-  let applications = [];
-
-  const navAuth = document.getElementById('nav-auth');
-  const registerSection = document.getElementById('register-section');
-  const loginSection = document.getElementById('login-section');
-  const employerDashboard = document.getElementById('employer-dashboard');
-  const workerDashboard = document.getElementById('worker-dashboard');
-
-  const registerForm = document.getElementById('register-form');
-  const registerMessage = document.getElementById('register-message');
-
-  const loginForm = document.getElementById('login-form');
-  const loginMessage = document.getElementById('login-message');
-
-  const jobPostForm = document.getElementById('job-post-form');
-  const employerJobsList = document.getElementById('employer-jobs-list');
-
-  const jobsList = document.getElementById('jobs-list');
-  const appliedJobsList = document.getElementById('applied-jobs-list');
-
-  function showSection(section) {
-    [registerSection, loginSection, employerDashboard, workerDashboard].forEach(s => s.classList.add('hidden'));
-    section.classList.remove('hidden');
-  }
-
-  document.getElementById('btn-show-register').addEventListener('click', () => {
-    showSection(registerSection);
-    registerMessage.textContent = '';
-  });
-
-  document.getElementById('btn-show-login').addEventListener('click', () => {
-    showSection(loginSection);
-    loginMessage.textContent = '';
-  });
-
-  registerForm.addEventListener('submit', async e => {
-    e.preventDefault();
-    const username = document.getElementById('reg-username').value.trim();
-    const password = document.getElementById('reg-password').value;
-    const role = document.getElementById('reg-role').value;
-
-    try {
-      const res = await fetch(`${API_URL}/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password, role })
+  <script>
+    function showPage(pageId) {
+      const pages = ['homePage', 'loginPage', 'signupPage'];
+      pages.forEach(id => {
+        document.getElementById(id).classList.add('hidden');
       });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Registration failed');
-      registerMessage.textContent = data.message;
-      registerMessage.className = 'message success';
-      registerForm.reset();
-    } catch (err) {
-      registerMessage.textContent = err.message;
-      registerMessage.className = 'message error';
+      document.getElementById(pageId).classList.remove('hidden');
     }
-  });
-
-  loginForm.addEventListener('submit', async e => {
-    e.preventDefault();
-    const username = document.getElementById('login-username').value.trim();
-    const password = document.getElementById('login-password').value;
-
-    try {
-      const res = await fetch(`${API_URL}/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Login failed');
-      currentUser = data;
-      loginMessage.textContent = '';
-      loginForm.reset();
-      navAuth.classList.add('hidden');
-      if (currentUser.role === 'employer') {
-        showSection(employerDashboard);
-        fetchEmployerJobs();
-      } else {
-        showSection(workerDashboard);
-        fetchJobs();
-        fetchApplications();
-      }
-    } catch (err) {
-      loginMessage.textContent = err.message;
-      loginMessage.className = 'message error';
-    }
-  });
-
-  document.getElementById('btn-logout-employer').addEventListener('click', () => {
-    currentUser = null;
-    navAuth.classList.remove('hidden');
-    showSection(loginSection);
-  });
-
-  document.getElementById('btn-logout-worker').addEventListener('click', () => {
-    currentUser = null;
-    navAuth.classList.remove('hidden');
-    showSection(loginSection);
-  });
-
-  jobPostForm.addEventListener('submit', async e => {
-    e.preventDefault();
-    const title = document.getElementById('job-title').value.trim();
-    const description = document.getElementById('job-description').value.trim();
-
-    if (!title || !description) return;
-
-    try {
-      const res = await fetch(`${API_URL}/jobs`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, description, employer: currentUser.username })
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || 'Failed to post job');
-      jobPostForm.reset();
-      fetchEmployerJobs();
-    } catch (err) {
-      alert(err.message);
-    }
-  });
-
-  async function fetchEmployerJobs() {
-    try {
-      const res = await fetch(`${API_URL}/jobs`);
-      const allJobs = await res.json();
-      const employerJobs = allJobs.filter(job => job.employer === currentUser.username);
-      renderEmployerJobs(employerJobs);
-    } catch (err) {
-      employerJobsList.textContent = 'Failed to load jobs.';
-    }
-  }
-
-  async function fetchJobs() {
-    try {
-      const res = await fetch(`${API_URL}/jobs`);
-      jobs = await res.json();
-      renderJobs();
-    } catch (err) {
-      jobsList.textContent = 'Failed to load jobs.';
-    }
-  }
-
-  // For demo, applications are stored in localStorage per user
-  function fetchApplications() {
-    const saved = localStorage.getItem(`applications_${currentUser.username}`);
-    applications = saved ? JSON.parse(saved) : [];
-    renderAppliedJobs();
-  }
-
-  function saveApplications() {
-    localStorage.setItem(`applications_${currentUser.username}`, JSON.stringify(applications));
-  }
-
-  function renderEmployerJobs(employerJobs) {
-    employerJobsList.innerHTML = '';
-    if (employerJobs.length === 0) {
-      employerJobsList.textContent = 'No jobs posted yet.';
-      return;
-    }
-    employerJobs.forEach(job => {
-      const div = document.createElement('div');
-      div.className = 'job';
-      div.innerHTML = `<h3>${job.title}</h3><p>${job.description}</p>`;
-      employerJobsList.appendChild(div);
-    });
-  }
-
-  function renderJobs() {
-    jobsList.innerHTML = '';
-    if (jobs.length === 0) {
-      jobsList.textContent = 'No jobs available at the moment.';
-      return;
-    }
-    jobs.forEach(job => {
-      const div = document.createElement('div');
-      div.className = 'job';
-      div.innerHTML = `<h3>${job.title}</h3><p>${job.description}</p>`;
-      const applied = applications.find(app => app.jobId === job.id);
-      const btn = document.createElement('button');
-      btn.textContent = applied ? 'Applied' : 'Apply';
-      btn.disabled = applied ? true : false;
-      btn.className = 'apply-btn';
-      btn.addEventListener('click', () => {
-        applications.push({ jobId: job.id });
-        saveApplications();
-        btn.textContent = 'Applied';
-        btn.disabled = true;
-        renderAppliedJobs();
-      });
-      div.appendChild(btn);
-      jobsList.appendChild(div);
-    });
-  }
-
-  function renderAppliedJobs() {
-    appliedJobsList.innerHTML = '';
-    const appliedJobs = applications
-      .map(app => jobs.find(job => job.id === app.jobId))
-      .filter(job => job !== undefined);
-
-    if (appliedJobs.length === 0) {
-      appliedJobsList.textContent = 'You have not applied to any jobs yet.';
-      return;
-    }
-    appliedJobs.forEach(job => {
-      const div = document.createElement('div');
-      div.className = 'job';
-      div.innerHTML = `<h3>${job.title}</h3><p>${job.description}</p>`;
-      appliedJobsList.appendChild(div);
-    });
-  }
-
-  // Initial view
-  showSection(loginSection);
-</script>
-
+  </script>
 </body>
 </html>
